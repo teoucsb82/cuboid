@@ -10,14 +10,15 @@ class Cuboid
     @length = length
     @width = width
     @height = height
+    validate_origin
+    return raise 'Dimensions must be positive real numbers' unless all_dimensions_are_positive_numbers?
   end
 
   def move_to!(x, y, z)
-    return raise 'Coordinates must be integers' unless [x, y, z].all? { |coord| coord.is_a?(Integer) }
-    return raise 'Coordinates must be positive' if [x, y, z].any? { |coord| coord < 0 }
     @origin[:x] = x
     @origin[:y] = y
     @origin[:z] = z
+    validate_origin
     true
   end
   
@@ -42,6 +43,10 @@ class Cuboid
 
   private
 
+  def all_dimensions_are_positive_numbers?
+    [@length, @width, @height].all? { |dimension| dimension.is_a?(Numeric) && dimension > 0 }
+  end
+
   def front_bottom_left_coordinates
     { x: @origin[:x], y: @origin[:y], z: @origin[:z] + @width }
   end
@@ -56,6 +61,10 @@ class Cuboid
 
   def front_top_right_coordinates
     { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] + @width }
+  end
+
+  def origin_coordinates_are_numbers?
+    [@origin[:x], @origin[:y], @origin[:z]].all? { |coord| coord.is_a?(Numeric) }
   end
   
   def rear_bottom_left_coordinates
@@ -72,6 +81,11 @@ class Cuboid
 
   def rear_top_right_coordinates
     { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] }
+  end
+
+  def validate_origin
+    return raise 'Origin must be a hash' unless @origin.is_a?(Hash)
+    return raise 'Options coordinates must be numbers' unless origin_coordinates_are_numbers?
   end
 end
 

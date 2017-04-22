@@ -11,6 +11,29 @@ describe Cuboid do
   
   let(:cuboid) { Cuboid.new(origin, length, width, height) }
 
+  describe '#initialize' do
+    context 'invalid origin' do
+      let(:origin) { 'foo' }
+      it { expect { cuboid }.to raise_error StandardError, 'Origin must be a hash' }
+    end
+
+    context 'invalid length' do
+      let(:length) { 'foo' }
+      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+      it { expect { Cuboid.new(origin, -1,-1,-1) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+    end
+
+    context 'invalid width' do
+      let(:width) { 'foo' }
+      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+    end
+
+    context 'invalid height' do
+      let(:height) { 'foo' }
+      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+    end
+  end
+
   describe "#move_to!" do
     it 'returns true in the simple happy case' do
       expect(cuboid.move_to!(1,2,3)).to be true
@@ -22,12 +45,8 @@ describe Cuboid do
     end
 
     context 'invalid arguments' do
-      it 'raises an error if any coordinates are out of bounds' do
-        expect { cuboid.move_to!(0,0,-1) }.to raise_error StandardError, 'Coordinates must be positive'
-      end
-
       it 'raises an error if any coordinates are not integers' do
-        expect { cuboid.move_to!('some', 'fance', 'coordinate') }.to raise_error StandardError, 'Coordinates must be integers'
+        expect { cuboid.move_to!('some', 'fance', 'coordinate') }.to raise_error StandardError, 'Options coordinates must be numbers'
       end
     end
   end    
