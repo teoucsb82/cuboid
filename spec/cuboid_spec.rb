@@ -13,7 +13,7 @@ describe Cuboid do
 
   describe "#move_to!" do
     it 'returns true in the simple happy case' do
-      expect(cuboid.move_to!(1,2,3)).to be true }
+      expect(cuboid.move_to!(1,2,3)).to be true
     end
     
     it "changes the origin in the simple happy case" do
@@ -21,6 +21,15 @@ describe Cuboid do
       expect(cuboid.origin).to eq({x: 1, y: 2, z: 3})
     end
 
+    context 'invalid arguments' do
+      it 'raises an error if any coordinates are out of bounds' do
+        expect { cuboid.move_to!(0,0,-1) }.to raise_error StandardError, 'Coordinates must be positive'
+      end
+
+      it 'raises an error if any coordinates are not integers' do
+        expect { cuboid.move_to!('some', 'fance', 'coordinate') }.to raise_error StandardError, 'Coordinates must be integers'
+      end
+    end
   end    
   
   describe "intersects?" do

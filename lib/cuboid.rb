@@ -1,3 +1,6 @@
+##
+# This class represents an arbitrary rectangular cuboid by origin and dimensions.
+
 class Cuboid
   attr_reader :origin
   
@@ -10,6 +13,8 @@ class Cuboid
   end
 
   def move_to!(x, y, z)
+    return raise 'Coordinates must be integers' unless [x, y, z].all? { |coord| coord.is_a?(Integer) }
+    return raise 'Coordinates must be positive' if [x, y, z].any? { |coord| coord < 0 }
     @origin[:x] = x
     @origin[:y] = y
     @origin[:z] = z
