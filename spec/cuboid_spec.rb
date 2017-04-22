@@ -12,7 +12,9 @@ describe Cuboid do
   let(:cuboid) { Cuboid.new(origin, length, width, height) }
 
   describe "#move_to!" do
-    it { expect(cuboid.move_to!(1,2,3)).to be true }
+    it 'returns true in the simple happy case' do
+      expect(cuboid.move_to!(1,2,3)).to be true }
+    end
     
     it "changes the origin in the simple happy case" do
       cuboid.move_to!(1,2,3)
@@ -24,4 +26,19 @@ describe Cuboid do
   describe "intersects?" do
   end
 
+  describe "vertices" do
+    it 'returns an array of hashed coordinates' do
+      expect(cuboid.vertices).to eq(
+      [
+        { x: 0, y: 0, z: 0 },
+        { x: 3, y: 0, z: 0 },
+        { x: 0, y: 0, z: 4 },
+        { x: 3, y: 0, z: 4 },
+        { x: 0, y: 5, z: 0 },
+        { x: 3, y: 5, z: 0 },
+        { x: 0, y: 5, z: 4 },
+        { x: 3, y: 5, z: 4 }
+      ])
+    end
+  end
 end

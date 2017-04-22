@@ -17,6 +17,16 @@ class Cuboid
   end
   
   def vertices
+    [
+      rear_bottom_left_coordinates,
+      rear_bottom_right_coordinates,
+      front_bottom_left_coordinates,
+      front_bottom_right_coordinates,
+      rear_top_left_coordinates,
+      rear_top_right_coordinates,
+      front_top_left_coordinates,
+      front_top_right_coordinates
+    ]
   end
   
   #returns true if the two cuboids intersect each other.  False otherwise.
@@ -24,5 +34,39 @@ class Cuboid
   end
 
   #END public methods that should be your starting point  
+
+  private
+
+  def front_bottom_left_coordinates
+    { x: @origin[:x], y: @origin[:y], z: @origin[:z] + @width }
+  end
+
+  def front_bottom_right_coordinates
+    { x: @origin[:x] + @length, y: @origin[:y], z: @origin[:z] + @width }
+  end
+
+  def front_top_left_coordinates
+    { x: @origin[:x], y: @origin[:y] + @height, z: @origin[:z] + @width }
+  end
+
+  def front_top_right_coordinates
+    { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] + @width }
+  end
+  
+  def rear_bottom_left_coordinates
+    { x: @origin[:x], y: @origin[:y], z: @origin[:z] }
+  end
+
+  def rear_bottom_right_coordinates
+    { x: @origin[:x] + @length, y: @origin[:y], z: @origin[:z] }
+  end
+
+  def rear_top_left_coordinates
+    { x: @origin[:x], y: @origin[:y] + @height, z: @origin[:z] }
+  end
+
+  def rear_top_right_coordinates
+    { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] }
+  end
 end
 
