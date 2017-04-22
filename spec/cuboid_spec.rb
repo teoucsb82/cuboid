@@ -5,8 +5,11 @@ require 'cuboid'
 #  methods as you feel need coverage
 describe Cuboid do
   let(:origin) { { x: 0, y: 0, z: 0 }}
-  let(:dimensions) { { length: 3, width: 4, height: 5 } }
-  let(:cuboid) { Cuboid.new(origin, dimensions) }
+  let(:length) { 3 }
+  let(:width) { 4 }
+  let(:height) { 5 }
+  
+  let(:cuboid) { Cuboid.new(origin, length, width, height) }
 
   describe "#move_to!" do
     it { expect(cuboid.move_to!(1,2,3)).to be true }

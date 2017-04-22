@@ -1,11 +1,12 @@
 class Cuboid
   attr_reader :origin
-  attr_reader :dimensions
   
   #BEGIN public methods that should be your starting point
-  def initialize(origin = {}, dimensions = {})
+  def initialize(origin = {}, length, width, height)
     @origin = origin
-    @dimensions = dimensions
+    @length = length
+    @width = width
+    @height = height
   end
 
   def move_to!(x, y, z)
