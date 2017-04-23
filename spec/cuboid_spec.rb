@@ -13,24 +13,25 @@ describe Cuboid do
 
   describe '#initialize' do
     context 'invalid origin' do
-      let(:origin) { 'foo' }
-      it { expect { cuboid }.to raise_error StandardError, 'Origin must be a hash' }
+      it { expect { Cuboid.new('foo', length, width, height) }.to raise_error StandardError, 'Origin must be a hash' }
+      it { expect { Cuboid.new(Hash.new, length, width, height) }.to raise_error StandardError, 'Origin must include x, y, and z coordinates' }
     end
 
-    context 'invalid length' do
-      let(:length) { 'foo' }
-      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
-      it { expect { Cuboid.new(origin, -1,-1,-1) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
-    end
+    context 'all dimensions must be positive & numeric' do
+      describe 'invalid length' do
+        it { expect { Cuboid.new(origin, 'foo', width, height) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+        it { expect { Cuboid.new(origin, 0, width, height) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+      end
 
-    context 'invalid width' do
-      let(:width) { 'foo' }
-      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
-    end
+      describe 'invalid width' do
+        it { expect { Cuboid.new(origin, length, 'foo', height) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+        it { expect { Cuboid.new(origin, length, 0, height) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+      end
 
-    context 'invalid height' do
-      let(:height) { 'foo' }
-      it { expect { cuboid }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+      describe 'invalid height' do
+        it { expect { Cuboid.new(origin, length, width, 'foo') }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+        it { expect { Cuboid.new(origin, length, width, 0) }.to raise_error StandardError, 'Dimensions must be positive real numbers' }
+      end
     end
   end
 
@@ -46,7 +47,7 @@ describe Cuboid do
 
     context 'invalid arguments' do
       it 'raises an error if any coordinates are not integers' do
-        expect { cuboid.move_to!('some', 'fance', 'coordinate') }.to raise_error StandardError, 'Options coordinates must be numbers'
+        expect { cuboid.move_to!('some', 'fancy', 'coordinate') }.to raise_error StandardError, 'Origin coordinates must be numbers'
       end
     end
   end    
@@ -63,13 +64,14 @@ describe Cuboid do
     let(:cuboid_2_height) { 5 }
     let(:cuboid_2) { Cuboid.new(cuboid_2_origin, cuboid_2_length, cuboid_2_width, cuboid_2_height) }
 
-    context 'totally separate cuboids' do
+    context 'totally separate cuboids in the simple happy case' do
       let(:cuboid_2_origin) { { x: 99, y: 99, z: 99 } } 
 
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq false }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq false }
     end
 
+    # literal "edge"-cases ;) touching != intersecting
     context 'adjacent cuboids' do
       context 'end to end cuboids' do
         let(:cuboid_2_origin) { { x: cuboid_1_length, y: 0, z: 0 } } 
@@ -93,6 +95,11 @@ describe Cuboid do
       end
     end
 
+    context 'identical cuboids' do
+      it { expect(cuboid_1.intersects?(cuboid_1)).to eq true }
+      it { expect(cuboid_1.intersects?(cuboid_1)).to eq true }
+    end
+
     context 'overlapping cuboids' do
       let(:cuboid_2_origin) { { x: 1, y: 1, z: 1 } } 
       
@@ -100,12 +107,36 @@ describe Cuboid do
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
     end
 
-    context 'one cuboid inside another' do
+    context 'one cuboid encased by another' do
+      # While one cuboid complete encasing another is not technically intersecting,
+      # return true in this scenario to capture the spirit of the challenge.
       let(:cuboid_1_origin) { { x: 0, y: 0, z: 0 } } 
       let(:cuboid_2_origin) { { x: 2, y: 2, z: 2 } } 
 
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq true }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
+    end
+
+    context 'one cuboid sticking directly through another' do
+      # imagine a 10x10" wooden square 1" thick magically floating 5" above the ground.
+      # now imagine a steel rod, 10" tall and 1" square plunged directly down through the
+      # middle of the board until it touches the ground. These items
+      # are clearly intersecting, despite none of their vertices being
+      # lodged inside the other. We have to check their intersecting
+      # planes (where steel goes through wood) to get accurate results.
+      let(:wooden_square) { Cuboid.new({x: 0, y: 5, z: 0}, 10, 10, 1)}
+      let(:steel_rod) { Cuboid.new({x: 5, y: 0, z: 5}, 1, 1, 10)}
+      
+      it { expect(steel_rod.intersects?(wooden_square)).to eq true }
+      it { expect(wooden_square.intersects?(steel_rod)).to eq true }
+    end
+
+    context 'steel rod & wooden shelf placed apart' do
+      let(:wooden_square) { Cuboid.new({x: 0, y: 5, z: 0}, 10, 10, 1)}
+      let(:steel_rod) { Cuboid.new({x: 10, y: 0, z: 0}, 1, 1, 10)}
+      
+      it { expect(steel_rod.intersects?(wooden_square)).to eq false }
+      it { expect(wooden_square.intersects?(steel_rod)).to eq false }
     end
   end
 

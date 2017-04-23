@@ -1,3 +1,4 @@
+require 'pry'
 ##
 # This class represents an arbitrary rectangular cuboid by origin and dimensions.
 
@@ -37,10 +38,34 @@ class Cuboid
   
   #returns true if the two cuboids intersect each other.  False otherwise.
   def intersects?(other)
+    any_corners_inside?(other) || other.any_corners_inside?(self) ||
+    any_sides_inside?(other) || other.any_sides_inside?(self) ||
+    identical_dimensions?(other)
   end
 
   #END public methods that should be your starting point  
+  protected
+  def any_corners_inside?(other)
+    x_coords = other.vertices.map { |coord| coord[:x] }
+    y_coords = other.vertices.map { |coord| coord[:y] }
+    z_coords = other.vertices.map { |coord| coord[:z] }
+    
+    # return true if any of the 8 edges are inside the other cuboid
+    vertices.any? do |coords|
+      coords[:x] > x_coords.min && coords[:x] < x_coords.max &&
+      coords[:y] > y_coords.min && coords[:y] < y_coords.max &&
+      coords[:z] > z_coords.min && coords[:z] < z_coords.max 
+    end
+  end
 
+  def any_sides_inside?(other)
+    false
+  end
+
+  def identical_dimensions?(other)
+    vertices == other.vertices
+  end
+  
   private
 
   def all_dimensions_are_positive_numbers?
@@ -85,7 +110,8 @@ class Cuboid
 
   def validate_origin
     return raise 'Origin must be a hash' unless @origin.is_a?(Hash)
-    return raise 'Options coordinates must be numbers' unless origin_coordinates_are_numbers?
+    return raise 'Origin must include x, y, and z coordinates' unless [:x, :y, :z].all? {|k| @origin.key?(k)}
+    return raise 'Origin coordinates must be numbers' unless origin_coordinates_are_numbers?
   end
 end
 
