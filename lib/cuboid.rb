@@ -4,8 +4,8 @@ require 'pry'
 
 class Cuboid
   attr_reader :origin
-  
-  #BEGIN public methods that should be your starting point
+
+  # BEGIN public methods that should be your starting point
   def initialize(origin = {}, length, width, height)
     @origin = origin
     @length = length
@@ -22,7 +22,7 @@ class Cuboid
     validate_origin
     true
   end
-  
+
   def vertices
     [
       rear_bottom_left_coordinates,
@@ -35,37 +35,39 @@ class Cuboid
       front_top_right_coordinates
     ]
   end
-  
-  #returns true if the two cuboids intersect each other.  False otherwise.
+
+  # returns true if the two cuboids intersect each other.  False otherwise.
   def intersects?(other)
     any_corners_inside?(other) || other.any_corners_inside?(self) ||
-    any_sides_inside?(other) || other.any_sides_inside?(self) ||
-    identical_dimensions?(other)
+      any_sides_inside?(other) || other.any_sides_inside?(self) ||
+      identical_dimensions?(other)
   end
 
-  #END public methods that should be your starting point  
+  # END public methods that should be your starting point
+
   protected
+
   def any_corners_inside?(other)
     x_coords = other.vertices.map { |coord| coord[:x] }
     y_coords = other.vertices.map { |coord| coord[:y] }
     z_coords = other.vertices.map { |coord| coord[:z] }
-    
+
     # return true if any of the 8 edges are inside the other cuboid
     vertices.any? do |coords|
       coords[:x] > x_coords.min && coords[:x] < x_coords.max &&
-      coords[:y] > y_coords.min && coords[:y] < y_coords.max &&
-      coords[:z] > z_coords.min && coords[:z] < z_coords.max 
+        coords[:y] > y_coords.min && coords[:y] < y_coords.max &&
+        coords[:z] > z_coords.min && coords[:z] < z_coords.max
     end
   end
 
-  def any_sides_inside?(other)
+  def any_sides_inside?(_other)
     false
   end
 
   def identical_dimensions?(other)
     vertices == other.vertices
   end
-  
+
   private
 
   def all_dimensions_are_positive_numbers?
@@ -91,7 +93,7 @@ class Cuboid
   def origin_coordinates_are_numbers?
     [@origin[:x], @origin[:y], @origin[:z]].all? { |coord| coord.is_a?(Numeric) }
   end
-  
+
   def rear_bottom_left_coordinates
     { x: @origin[:x], y: @origin[:y], z: @origin[:z] }
   end
@@ -114,4 +116,3 @@ class Cuboid
     return raise 'Origin coordinates must be numbers' unless origin_coordinates_are_numbers?
   end
 end
-

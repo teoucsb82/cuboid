@@ -1,20 +1,20 @@
 require 'cuboid'
 
-#This test is incomplete and, in fact, won't even run without errors.  
+# This test is incomplete and, in fact, won't even run without errors.
 #  Do whatever you need to do to make it work and please add your own test cases for as many
 #  methods as you feel need coverage
 describe Cuboid do
-  let(:origin) { { x: 0, y: 0, z: 0 }}
+  let(:origin) { { x: 0, y: 0, z: 0 } }
   let(:length) { 3 }
   let(:width) { 4 }
   let(:height) { 5 }
-  
+
   let(:cuboid) { Cuboid.new(origin, length, width, height) }
 
   describe '#initialize' do
     context 'invalid origin' do
       it { expect { Cuboid.new('foo', length, width, height) }.to raise_error StandardError, 'Origin must be a hash' }
-      it { expect { Cuboid.new(Hash.new, length, width, height) }.to raise_error StandardError, 'Origin must include x, y, and z coordinates' }
+      it { expect { Cuboid.new({}, length, width, height) }.to raise_error StandardError, 'Origin must include x, y, and z coordinates' }
     end
 
     context 'all dimensions must be positive & numeric' do
@@ -35,14 +35,14 @@ describe Cuboid do
     end
   end
 
-  describe "#move_to!" do
+  describe '#move_to!' do
     it 'returns true in the simple happy case' do
-      expect(cuboid.move_to!(1,2,3)).to be true
+      expect(cuboid.move_to!(1, 2, 3)).to be true
     end
-    
-    it "changes the origin in the simple happy case" do
-      cuboid.move_to!(1,2,3)
-      expect(cuboid.origin).to eq({x: 1, y: 2, z: 3})
+
+    it 'changes the origin in the simple happy case' do
+      cuboid.move_to!(1, 2, 3)
+      expect(cuboid.origin).to eq(x: 1, y: 2, z: 3)
     end
 
     context 'invalid arguments' do
@@ -50,10 +50,10 @@ describe Cuboid do
         expect { cuboid.move_to!('some', 'fancy', 'coordinate') }.to raise_error StandardError, 'Origin coordinates must be numbers'
       end
     end
-  end    
-  
-  describe "intersects?" do
-    let(:cuboid_1_origin) { { x: 0, y: 0, z: 0 } } 
+  end
+
+  describe 'intersects?' do
+    let(:cuboid_1_origin) { { x: 0, y: 0, z: 0 } }
     let(:cuboid_1_length) { 10 }
     let(:cuboid_1_width) { 10 }
     let(:cuboid_1_height) { 10 }
@@ -65,7 +65,7 @@ describe Cuboid do
     let(:cuboid_2) { Cuboid.new(cuboid_2_origin, cuboid_2_length, cuboid_2_width, cuboid_2_height) }
 
     context 'totally separate cuboids in the simple happy case' do
-      let(:cuboid_2_origin) { { x: 99, y: 99, z: 99 } } 
+      let(:cuboid_2_origin) { { x: 99, y: 99, z: 99 } }
 
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq false }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq false }
@@ -74,21 +74,21 @@ describe Cuboid do
     # literal "edge"-cases ;) touching != intersecting
     context 'adjacent cuboids' do
       context 'end to end cuboids' do
-        let(:cuboid_2_origin) { { x: cuboid_1_length, y: 0, z: 0 } } 
+        let(:cuboid_2_origin) { { x: cuboid_1_length, y: 0, z: 0 } }
 
         it { expect(cuboid_1.intersects?(cuboid_2)).to eq false }
         it { expect(cuboid_2.intersects?(cuboid_1)).to eq false }
       end
 
       context 'side by side cuboids' do
-        let(:cuboid_2_origin) { { x: 0, y: 0, z: cuboid_1_width } } 
+        let(:cuboid_2_origin) { { x: 0, y: 0, z: cuboid_1_width } }
 
         it { expect(cuboid_1.intersects?(cuboid_2)).to eq false }
         it { expect(cuboid_2.intersects?(cuboid_1)).to eq false }
       end
 
       context 'vertically stacked cuboids' do
-        let(:cuboid_2_origin) { { x: 0, y: cuboid_1_height, z: 0 } } 
+        let(:cuboid_2_origin) { { x: 0, y: cuboid_1_height, z: 0 } }
 
         it { expect(cuboid_1.intersects?(cuboid_2)).to eq false }
         it { expect(cuboid_2.intersects?(cuboid_1)).to eq false }
@@ -101,8 +101,8 @@ describe Cuboid do
     end
 
     context 'overlapping cuboids' do
-      let(:cuboid_2_origin) { { x: 1, y: 1, z: 1 } } 
-      
+      let(:cuboid_2_origin) { { x: 1, y: 1, z: 1 } }
+
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq true }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
     end
@@ -110,8 +110,8 @@ describe Cuboid do
     context 'one cuboid encased by another' do
       # While one cuboid complete encasing another is not technically intersecting,
       # return true in this scenario to capture the spirit of the challenge.
-      let(:cuboid_1_origin) { { x: 0, y: 0, z: 0 } } 
-      let(:cuboid_2_origin) { { x: 2, y: 2, z: 2 } } 
+      let(:cuboid_1_origin) { { x: 0, y: 0, z: 0 } }
+      let(:cuboid_2_origin) { { x: 2, y: 2, z: 2 } }
 
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq true }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
@@ -124,35 +124,36 @@ describe Cuboid do
       # are clearly intersecting, despite none of their vertices being
       # lodged inside the other. We have to check their intersecting
       # planes (where steel goes through wood) to get accurate results.
-      let(:wooden_square) { Cuboid.new({x: 0, y: 5, z: 0}, 10, 10, 1)}
-      let(:steel_rod) { Cuboid.new({x: 5, y: 0, z: 5}, 1, 1, 10)}
-      
+      let(:wooden_square) { Cuboid.new({ x: 0, y: 5, z: 0 }, 10, 10, 1) }
+      let(:steel_rod) { Cuboid.new({ x: 5, y: 0, z: 5 }, 1, 1, 10) }
+
       it { expect(steel_rod.intersects?(wooden_square)).to eq true }
       it { expect(wooden_square.intersects?(steel_rod)).to eq true }
     end
 
     context 'steel rod & wooden shelf placed apart' do
-      let(:wooden_square) { Cuboid.new({x: 0, y: 5, z: 0}, 10, 10, 1)}
-      let(:steel_rod) { Cuboid.new({x: 10, y: 0, z: 0}, 1, 1, 10)}
-      
+      let(:wooden_square) { Cuboid.new({ x: 0, y: 5, z: 0 }, 10, 10, 1) }
+      let(:steel_rod) { Cuboid.new({ x: 10, y: 0, z: 0 }, 1, 1, 10) }
+
       it { expect(steel_rod.intersects?(wooden_square)).to eq false }
       it { expect(wooden_square.intersects?(steel_rod)).to eq false }
     end
   end
 
-  describe "vertices" do
+  describe 'vertices' do
     it 'returns an array of hashed coordinates' do
       expect(cuboid.vertices).to eq(
-      [
-        { x: 0, y: 0, z: 0 },
-        { x: 3, y: 0, z: 0 },
-        { x: 0, y: 0, z: 4 },
-        { x: 3, y: 0, z: 4 },
-        { x: 0, y: 5, z: 0 },
-        { x: 3, y: 5, z: 0 },
-        { x: 0, y: 5, z: 4 },
-        { x: 3, y: 5, z: 4 }
-      ])
+        [
+          { x: 0, y: 0, z: 0 },
+          { x: 3, y: 0, z: 0 },
+          { x: 0, y: 0, z: 4 },
+          { x: 3, y: 0, z: 4 },
+          { x: 0, y: 5, z: 0 },
+          { x: 3, y: 5, z: 0 },
+          { x: 0, y: 5, z: 4 },
+          { x: 3, y: 5, z: 4 }
+        ]
+      )
     end
   end
 end
