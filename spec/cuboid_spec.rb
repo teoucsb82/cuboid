@@ -15,7 +15,7 @@ describe Cuboid do
     context 'invalid origin' do
       it { expect { Cuboid.new(0, length, width, height) }.to raise_error StandardError, 'Origin must be a hash' }
       it { expect { Cuboid.new({}, length, width, height) }.to raise_error StandardError, 'Origin must include x, y, and z coordinates' }
-      it { expect { Cuboid.new({x: 0, y: :bar, z: nil}, length, width, height) }.to raise_error StandardError, 'Origin coordinates must be numeric' }
+      it { expect { Cuboid.new({ x: 0, y: :bar, z: nil }, length, width, height) }.to raise_error StandardError, 'Origin coordinates must be numeric' }
     end
 
     context 'all dimensions must be positive & numeric' do
@@ -33,6 +33,81 @@ describe Cuboid do
     end
   end
 
+  describe '#rotate!' do
+    it 'returns true in the simple happy case' do
+      floating_cuboid = Cuboid.new({x: 5, y: 5, z: 5}, length, width, height)
+      expect(floating_cuboid.rotate!(:up)).to be true
+    end
+
+    it 'only accepts 6 directions' do
+      expect { cuboid.rotate!(:foo) }.to raise_error StandardError, 'Direction must be in [:up, :down, :left, :right, :clockwise, :counterclockwise]'
+    end
+
+    context 'rotating outside of the box' do
+      it 'resets origin, length, width and height to starting positions if rotate! fails' do
+        %i[up down left right clockwise counterclockwise].each do |direction|
+          expect{cuboid.rotate!(direction)}.to raise_error StandardError, 'Cannot rotate into negative coordinates.'
+          expect(cuboid.instance_variable_get(:@length)).to eq(3)
+          expect(cuboid.instance_variable_get(:@width)).to eq(4)
+          expect(cuboid.instance_variable_get(:@height)).to eq(5)
+          expect(cuboid.instance_variable_get(:@origin)).to eq(x: 0, y: 0, z: 0)
+        end
+      end
+    end
+
+    describe 'modifies the origin, length, width, and height to account for direction of turn' do
+      let(:origin) { { x: 10, y: 10, z: 10 } }
+
+      it 'rotates up' do
+        cuboid.rotate!(:up)
+        expect(cuboid.instance_variable_get(:@length)).to eq(5)
+        expect(cuboid.instance_variable_get(:@width)).to eq(4)
+        expect(cuboid.instance_variable_get(:@height)).to eq(3)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10 - height, y: 10, z: 10)
+      end
+
+      it 'rotates down' do
+        cuboid.rotate!(:down)
+        expect(cuboid.instance_variable_get(:@length)).to eq(5)
+        expect(cuboid.instance_variable_get(:@width)).to eq(4)
+        expect(cuboid.instance_variable_get(:@height)).to eq(3)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 10 - length)
+      end
+
+      it 'rotates left' do
+        cuboid.rotate!(:left)
+        expect(cuboid.instance_variable_get(:@length)).to eq(4)
+        expect(cuboid.instance_variable_get(:@width)).to eq(3)
+        expect(cuboid.instance_variable_get(:@height)).to eq(5)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10 - length, z: 10)
+      end
+
+      it 'rotates right' do
+        cuboid.rotate!(:right)
+        expect(cuboid.instance_variable_get(:@length)).to eq(4)
+        expect(cuboid.instance_variable_get(:@width)).to eq(3)
+        expect(cuboid.instance_variable_get(:@height)).to eq(5)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10 - width, y: 10, z: 10)
+      end
+
+      it 'rotates clockwise' do
+        cuboid.rotate!(:clockwise)
+        expect(cuboid.instance_variable_get(:@length)).to eq(3)
+        expect(cuboid.instance_variable_get(:@width)).to eq(5)
+        expect(cuboid.instance_variable_get(:@height)).to eq(4)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 10 - width)
+      end
+
+      it 'rotates counterclockwise' do
+        cuboid.rotate!(:counterclockwise)
+        expect(cuboid.instance_variable_get(:@length)).to eq(3)
+        expect(cuboid.instance_variable_get(:@width)).to eq(5)
+        expect(cuboid.instance_variable_get(:@height)).to eq(4)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10 - height, z: 10)
+      end
+    end
+  end
+
   describe '#move_to!' do
     it 'returns true in the simple happy case' do
       expect(cuboid.move_to!(1, 2, 3)).to be true
@@ -40,7 +115,7 @@ describe Cuboid do
 
     it 'changes the origin in the simple happy case' do
       cuboid.move_to!(1, 2, 3)
-      expect(cuboid.origin).to eq(x: 1, y: 2, z: 3)
+      expect(cuboid.instance_variable_get(:@origin)).to eq(x: 1, y: 2, z: 3)
     end
 
     context 'invalid arguments' do
@@ -118,7 +193,7 @@ describe Cuboid do
     end
 
     context 'one cuboid sticking directly through another' do
-      # imagine a 10x10" wooden square 1" thick magically floating 5" above the ground.
+      # Imagine a 10x10" wooden square 1" thick magically floating 5" above the ground.
       # now imagine a steel rod, 10" tall and 1" square plunged directly down through the
       # middle of the board until it touches the ground. These items
       # are clearly intersecting, despite none of their vertices being
