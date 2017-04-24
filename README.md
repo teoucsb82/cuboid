@@ -1,43 +1,73 @@
-# Rails Coding Challenge
+# Cuboid Quickstart
 
-Here's a coding challenge related to a problem we actually faced. Feel free to ask any questions to fill in the blanks.
+## Initializing a cuboid object
+Requires an `origin` (hash), `length` (numeric), `width` (numeric) and `height` (numeric).
+Assumptions: 
 
-Write code that represents 3D objects in space - to keep it real simple, only "rectangular cuboids." That way you could represent one by having an origin (z,y,x) and length, width, height. Of course, you should be able to create (initialize) an object at a certain origin, with a certain length/width/height. You should also be able to move your object to a different origin. Additionally, you should be able to get a list of the vertices that represent the cuboid (a total of 8 vertices). 
+  - All dimensions (l/w/h) must be numeric and positive (no 2d objects, sorry). `origin` hash must contain `:x`, `:y` and `:z` keys.
 
-Now here's the important part - write a method that tests whether or not 2 cuboids are overlapping. 
+```
+origin = { x: 0, y: 0, z: 0 }
+length = 3
+width = 4
+height = 5
+cuboid = Cuboid.new(origin, length, width, height)
 
-Bonus points:
-Allow your objects to rotate (to keep it simple, only at 90 degree angles). The "tricky" part about the rotation is that - imagine the origin is walled - a rotation of an object that is up against a corner would also require the object to shift if you are rotating the object around its origin. This restriction exists because the objects are actually part of a bin packing algorithm - meaning the objects are inside a box and can only exist within the walls of the outer box. 
+=> #<Cuboid:0x007fa00c8016b0 @origin={:x=>0, :y=>0, :z=>0}, @length=3, @width=4, @height=5>
+```
 
-We expect that you should be able to complete this challenge with 1-3 hours of work, depending on how thorough you are.  If it's taking longer than that then please re-read the directions or reach out to us becuase you might be doing more than is necessary.
+## Obtaining cuboid vertices
+Given a `cuboid` object, `#vertices` will return an array of 8 coordinates in x,y,z space
 
-## How to submit your results
-Please follow these directions precisely because they affect our ability to evaluate your results.
+```
+cuboid.vertices
+=> [
+    {:x=>0, :y=>0, :z=>0}, 
+    {:x=>3, :y=>0, :z=>0}, 
+    {:x=>0, :y=>0, :z=>4}, 
+    {:x=>3, :y=>0, :z=>4}, 
+    {:x=>0, :y=>5, :z=>0}, 
+    {:x=>3, :y=>5, :z=>0}, 
+    {:x=>0, :y=>5, :z=>4}, 
+    {:x=>3, :y=>5, :z=>4}
+   ]
+```
 
-1. Download this repo
-2. Do your coding challenge and zip up your local repo
-3. Email the link to the zip file to steven@touchofmodern.com and the recruiter you're working with to let us know you're ready.
+## Checking if two objects intersect?
+Assumptions: 
 
-## What we are looking for
-We are looking for several things with this challenge.  First, of course, we're looking for your answer to be technically correct. Beyond that, we're also looking for:
+  - If one object encases another, (say, 1" square cube inside a 2" square cube), that counts as "intersecting" even though no edges overlap.
 
-1. Is your code easy to read and understand?
-2. Are you following the usual conventions for Ruby development?
-3. How good are you at writing tests? And how easy are they to read and understand?
-4. Did you follow these directions?
+```
+cuboid_2 = Cuboid.new(origin, length + 1, width + 1, height + 1)
+cuboid_2.intersects?(cuboid)
+=> true
 
-Basically, write the code as if you were going to release it to a real website with an actual warehouse and if you mess it up then boxes will start piling up on the floor and stuff.  Because that's what happened to us.
+cuboid_3 = Cuboid.new({x: 100, y: 100, z: 100}, length, width, height)
+cuboid_3.intersects?(cuboid_2)
+=> false
 
-When we get your response, here's exactly what we're going to do:
+cuboid_3.intersects?(cuboid)
+=> false
+```
 
-1. Run "bundle exec rake" and see that the tests pass.
-2. Look at the code itself to see its correctness, readability, and general elegance.
-3. Look at the tests to see their correctness, readability, and comprehensiveness.
-4. Maybe write a few more tests of our own to see if we can break stuff.
+## Rotation
+Assumptions: 
 
-That's it.  There aren't any hidden gotchas or trick questions.  That's really what we're going to do.
+  - Cube can `#rotate!` in one of 6 directions --> `:up`, `:down`, `:left`, `:right`, `:clockwise` or `: counterclockwise`. 
+  - Rotating a cuboid moves it around its original `origin`, and will return the same `cuboid` object with modified dimensions and `origin` depending on the direction.
+  - Rotating a cube into negative `origin` coordinates (ex, if you started at `x: 0, y: 0, z:0`) will raise an error.
 
-If you have any questions, please don't hesitate to contact me at steven@touchofmodern.com
 
---Steven
+```
+origin = { x: 10, y: 10, z: 10 }
+length = 3
+width = 4
+height = 5
+cuboid = Cuboid.new(origin, length, width, height)
 
+=> #<Cuboid:0x007f98650257d8 @origin={:x=>10, :y=>10, :z=>10}, @length=3, @width=4, @height=5>
+
+cuboid.rotate!(:up)
+=> #<Cuboid:0x007f98650257d8 @origin={:x=>5, :y=>10, :z=>10}, @length=5, @width=4, @height=3>
+```

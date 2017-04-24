@@ -63,7 +63,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(5)
         expect(cuboid.instance_variable_get(:@width)).to eq(4)
         expect(cuboid.instance_variable_get(:@height)).to eq(3)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10 - height, y: 10, z: 10)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 5, y: 10, z: 10)
       end
 
       it 'rotates down' do
@@ -71,7 +71,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(5)
         expect(cuboid.instance_variable_get(:@width)).to eq(4)
         expect(cuboid.instance_variable_get(:@height)).to eq(3)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 10 - length)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 7)
       end
 
       it 'rotates left' do
@@ -79,7 +79,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(4)
         expect(cuboid.instance_variable_get(:@width)).to eq(3)
         expect(cuboid.instance_variable_get(:@height)).to eq(5)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10 - length, z: 10)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 7, z: 10)
       end
 
       it 'rotates right' do
@@ -87,7 +87,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(4)
         expect(cuboid.instance_variable_get(:@width)).to eq(3)
         expect(cuboid.instance_variable_get(:@height)).to eq(5)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10 - width, y: 10, z: 10)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 6, y: 10, z: 10)
       end
 
       it 'rotates clockwise' do
@@ -95,7 +95,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(3)
         expect(cuboid.instance_variable_get(:@width)).to eq(5)
         expect(cuboid.instance_variable_get(:@height)).to eq(4)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 10 - width)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10, z: 6)
       end
 
       it 'rotates counterclockwise' do
@@ -103,7 +103,7 @@ describe Cuboid do
         expect(cuboid.instance_variable_get(:@length)).to eq(3)
         expect(cuboid.instance_variable_get(:@width)).to eq(5)
         expect(cuboid.instance_variable_get(:@height)).to eq(4)
-        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 10 - height, z: 10)
+        expect(cuboid.instance_variable_get(:@origin)).to eq(x: 10, y: 5, z: 10)
       end
     end
   end
@@ -182,6 +182,20 @@ describe Cuboid do
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
     end
 
+    context 'cuboids with fractional lengths' do
+      let(:cuboid_1_length) { 1.5 }
+      let(:cuboid_1_width)  { 2.5 }
+      let(:cuboid_1_height) { 3.5 }
+
+      let(:cuboid_2_origin) { cuboid_1_origin }
+      let(:cuboid_2_length) { 3.5 }
+      let(:cuboid_2_width)  { 4.5 }
+      let(:cuboid_2_height) { 5.5 }
+
+      it { expect(cuboid_1.intersects?(cuboid_2)).to eq true }
+      it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
+    end
+
     context 'one cuboid encased by another' do
       # While one cuboid complete encasing another is not technically intersecting,
       # return true in this scenario to capture the spirit of the challenge.
@@ -190,6 +204,36 @@ describe Cuboid do
 
       it { expect(cuboid_1.intersects?(cuboid_2)).to eq true }
       it { expect(cuboid_2.intersects?(cuboid_1)).to eq true }
+    end
+
+    context 'complex cuboids' do
+      # 2D-Visual representation of 3D-rods. 
+      # Assume equal widths, and no Y axis
+
+      # Z- Axis vertical
+      #   A  B  C
+      #      |
+      #   |  |
+      #   |  |  
+      #   |  |  
+      #   |     |
+      # ---------- D
+      #   |     |
+      # X-Axis horizontal
+
+      let(:rod_A) { Cuboid.new({x: 2, y: 1, z: 0}, 2, 2, 7) }
+      let(:rod_B) { Cuboid.new({x: 4, y: 4, z: 0}, 2, 2, 5) }
+      let(:rod_C) { Cuboid.new({x: 6, y: 1, z: 0}, 2, 2, 3) }
+      let(:rod_D) { Cuboid.new({x: 0, y: 0, z: 1}, 10, 2, 2) }
+      
+      it { expect(rod_A.intersects?(rod_B)).to eq false }
+      it { expect(rod_A.intersects?(rod_C)).to eq false }
+      it { expect(rod_A.intersects?(rod_D)).to eq true }
+
+      it { expect(rod_B.intersects?(rod_C)).to eq false }
+      it { expect(rod_B.intersects?(rod_D)).to eq false }
+      
+      it { expect(rod_C.intersects?(rod_D)).to eq true }
     end
 
     context 'one cuboid sticking directly through another' do

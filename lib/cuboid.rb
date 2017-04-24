@@ -1,4 +1,3 @@
-require 'pry'
 ##
 # This class represents an arbitrary rectangular cuboid by origin and dimensions.
 
@@ -21,20 +20,23 @@ class Cuboid
   end
 
   def move_to!(x, y, z)
+    validate_coordinates(x, y, z)
     @origin = { x: x, y: y, z: z }
-    validate_origin
+    true
   end
 
+  # pass in a direction symbol to rotate the cuboid around the origin
+  # raises an error if this would alter the origin to negative coordinates (outside bounds)
   def rotate!(direction_sym)
-    @direction = direction_sym
-    validate_direction
-    case @direction
+    case direction_sym
     when :up then rotate_up
     when :down then rotate_down
     when :left then rotate_left
     when :right then rotate_right
     when :clockwise then rotate_clockwise
     when :counterclockwise then rotate_counterclockwise
+    else 
+      raise "Direction must be in [:up, :down, :left, :right, :clockwise, :counterclockwise]"
     end
     true
   end
@@ -102,8 +104,8 @@ class Cuboid
     { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] + @width }
   end
 
-  def origin_coordinates_are_numeric?
-    [@origin[:x], @origin[:y], @origin[:z]].all? { |coord| coord.is_a?(Numeric) }
+  def origin_coordinates_are_numeric?(x, y, z)
+    [x, y, z].all? { |coord| coord.is_a?(Numeric) }
   end
 
   def rear_bottom_left_coordinates
@@ -170,21 +172,20 @@ class Cuboid
     @height, @width = @width, @height
   end
 
-  def validate_dimensions
-    raise 'Dimensions must be positive real numbers' unless all_dimensions_are_positive_numbers?
+  def validate_coordinates(x, y, z)
+    raise 'Origin coordinates must be numeric' unless origin_coordinates_are_numeric?(x, y, z)
     true
   end
 
-  def validate_direction
-    valid_directions = %i[up down left right clockwise counterclockwise]
-    raise "Direction must be in #{valid_directions}" unless valid_directions.include?(@direction)
+  def validate_dimensions
+    raise 'Dimensions must be positive real numbers' unless all_dimensions_are_positive_numbers?
     true
   end
 
   def validate_origin
     raise 'Origin must be a hash' unless @origin.is_a?(Hash)
     raise 'Origin must include x, y, and z coordinates' unless %i[x y z].all? { |k| @origin.key?(k) }
-    raise 'Origin coordinates must be numeric' unless origin_coordinates_are_numeric?
+    validate_coordinates(@origin[:x], @origin[:y], @origin[:z])
     true
   end
 
@@ -251,3 +252,17 @@ class Cuboid
     end
   end
 end
+
+def hi
+origin = { x: 10, y: 10, z: 10 }
+length = 3
+width = 4
+height = 5
+cuboid = Cuboid.new(origin, length, width, height)
+p cuboid
+
+cuboid.rotate!(:up)
+p cuboid
+end
+
+hi
