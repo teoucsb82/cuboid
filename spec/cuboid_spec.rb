@@ -12,6 +12,10 @@ describe Cuboid do
   let(:cuboid) { Cuboid.new(origin, length, width, height) }
 
   describe '#initialize' do
+    context 'happy case with origin (hash), length (numeric), width (numeric), height (numeric)' do
+      it { expect { Cuboid.new(origin, length, width, height) }.not_to raise_error }
+    end
+
     context 'invalid origin' do
       it { expect { Cuboid.new('foo', length, width, height) }.to raise_error StandardError, 'Origin must be a hash' }
       it { expect { Cuboid.new({}, length, width, height) }.to raise_error StandardError, 'Origin must include x, y, and z coordinates' }
@@ -96,8 +100,10 @@ describe Cuboid do
     end
 
     context 'identical cuboids' do
+      let(:cuboid_2_origin) { cuboid_1_origin }
+
       it { expect(cuboid_1.intersects?(cuboid_1)).to eq true }
-      it { expect(cuboid_1.intersects?(cuboid_1)).to eq true }
+      it { expect(cuboid_2.intersects?(cuboid_2)).to eq true }
     end
 
     context 'overlapping cuboids' do
@@ -129,14 +135,6 @@ describe Cuboid do
 
       it { expect(steel_rod.intersects?(wooden_square)).to eq true }
       it { expect(wooden_square.intersects?(steel_rod)).to eq true }
-    end
-
-    context 'steel rod & wooden shelf placed apart' do
-      let(:wooden_square) { Cuboid.new({ x: 0, y: 5, z: 0 }, 10, 10, 1) }
-      let(:steel_rod) { Cuboid.new({ x: 10, y: 0, z: 0 }, 1, 1, 10) }
-
-      it { expect(steel_rod.intersects?(wooden_square)).to eq false }
-      it { expect(wooden_square.intersects?(steel_rod)).to eq false }
     end
   end
 
