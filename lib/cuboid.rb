@@ -78,10 +78,6 @@ class Cuboid
     [@length, @width, @height].all? { |dimension| dimension.is_a?(Numeric) && dimension > 0 }
   end
 
-  def edges
-    edges_xy + edges_xz + edges_yz
-  end
-
   def edges_xy
     [
       [rear_bottom_left_coordinates, front_bottom_left_coordinates],
@@ -125,7 +121,7 @@ class Cuboid
     { x: @origin[:x] + @length, y: @origin[:y] + @height, z: @origin[:z] + @width }
   end
 
-  def origin_coordinates_are_numbers?
+  def origin_coordinates_are_numeric?
     [@origin[:x], @origin[:y], @origin[:z]].all? { |coord| coord.is_a?(Numeric) }
   end
 
@@ -152,7 +148,7 @@ class Cuboid
   def validate_origin
     return raise 'Origin must be a hash' unless @origin.is_a?(Hash)
     return raise 'Origin must include x, y, and z coordinates' unless [:x, :y, :z].all? {|k| @origin.key?(k)}
-    return raise 'Origin coordinates must be numbers' unless origin_coordinates_are_numbers?
+    return raise 'Origin coordinates must be numeric' unless origin_coordinates_are_numeric?
   end
 
   def xy_edges_inside?
