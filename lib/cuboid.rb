@@ -35,8 +35,8 @@ class Cuboid
     when :right then rotate_right
     when :clockwise then rotate_clockwise
     when :counterclockwise then rotate_counterclockwise
-    else 
-      raise "Direction must be in [:up, :down, :left, :right, :clockwise, :counterclockwise]"
+    else
+      raise 'Direction must be in [:up, :down, :left, :right, :clockwise, :counterclockwise]'
     end
     true
   end
@@ -252,17 +252,3 @@ class Cuboid
     end
   end
 end
-
-def hi
-origin = { x: 10, y: 10, z: 10 }
-length = 3
-width = 4
-height = 5
-cuboid = Cuboid.new(origin, length, width, height)
-p cuboid
-
-cuboid.rotate!(:up)
-p cuboid
-end
-
-hi

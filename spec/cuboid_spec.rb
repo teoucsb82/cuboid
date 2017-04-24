@@ -35,7 +35,7 @@ describe Cuboid do
 
   describe '#rotate!' do
     it 'returns true in the simple happy case' do
-      floating_cuboid = Cuboid.new({x: 5, y: 5, z: 5}, length, width, height)
+      floating_cuboid = Cuboid.new({ x: 5, y: 5, z: 5 }, length, width, height)
       expect(floating_cuboid.rotate!(:up)).to be true
     end
 
@@ -46,7 +46,7 @@ describe Cuboid do
     context 'rotating outside of the box' do
       it 'resets origin, length, width and height to starting positions if rotate! fails' do
         %i[up down left right clockwise counterclockwise].each do |direction|
-          expect{cuboid.rotate!(direction)}.to raise_error StandardError, 'Cannot rotate into negative coordinates.'
+          expect { cuboid.rotate!(direction) }.to raise_error StandardError, 'Cannot rotate into negative coordinates.'
           expect(cuboid.instance_variable_get(:@length)).to eq(3)
           expect(cuboid.instance_variable_get(:@width)).to eq(4)
           expect(cuboid.instance_variable_get(:@height)).to eq(5)
@@ -207,32 +207,32 @@ describe Cuboid do
     end
 
     context 'complex cuboids' do
-      # 2D-Visual representation of 3D-rods. 
+      # 2D-Visual representation of 3D-rods.
       # Assume equal widths, and no Y axis
 
       # Z- Axis vertical
       #   A  B  C
       #      |
       #   |  |
-      #   |  |  
-      #   |  |  
+      #   |  |
+      #   |  |
       #   |     |
       # ---------- D
       #   |     |
       # X-Axis horizontal
 
-      let(:rod_A) { Cuboid.new({x: 2, y: 1, z: 0}, 2, 2, 7) }
-      let(:rod_B) { Cuboid.new({x: 4, y: 4, z: 0}, 2, 2, 5) }
-      let(:rod_C) { Cuboid.new({x: 6, y: 1, z: 0}, 2, 2, 3) }
-      let(:rod_D) { Cuboid.new({x: 0, y: 0, z: 1}, 10, 2, 2) }
-      
+      let(:rod_A) { Cuboid.new({ x: 2, y: 1, z: 0 }, 2, 2, 7) }
+      let(:rod_B) { Cuboid.new({ x: 4, y: 4, z: 0 }, 2, 2, 5) }
+      let(:rod_C) { Cuboid.new({ x: 6, y: 1, z: 0 }, 2, 2, 3) }
+      let(:rod_D) { Cuboid.new({ x: 0, y: 0, z: 1 }, 10, 2, 2) }
+
       it { expect(rod_A.intersects?(rod_B)).to eq false }
       it { expect(rod_A.intersects?(rod_C)).to eq false }
       it { expect(rod_A.intersects?(rod_D)).to eq true }
 
       it { expect(rod_B.intersects?(rod_C)).to eq false }
       it { expect(rod_B.intersects?(rod_D)).to eq false }
-      
+
       it { expect(rod_C.intersects?(rod_D)).to eq true }
     end
 
