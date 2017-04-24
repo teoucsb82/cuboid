@@ -51,12 +51,25 @@ cuboid_3.intersects?(cuboid)
 => false
 ```
 
+## Moving objects
+Assumptions: 
+
+  - Requires a new `x`, `y` and `z` coordinate set, which must be numeric (or errors will be raised).
+  - Moving an object will modify the `origin` coordinates.
+
+```
+cuboid.move_to!(10, 20, 30)
+p cuboid
+=> #<Cuboid:0x007f98650257d8 @origin={:x=>10, :y=>20, :z=>30}, @length=3, @width=4, @height=5>
+```
+
 ## Rotation
 Assumptions: 
 
-  - Cube can `#rotate!` in one of 6 directions --> `:up`, `:down`, `:left`, `:right`, `:clockwise` or `: counterclockwise`. 
+  - Cuboids can `#rotate!` in one of 6 directions --> `:up`, `:down`, `:left`, `:right`, `:clockwise` or `: counterclockwise`. 
   - Rotating a cuboid moves it around its original `origin`, and will return the same `cuboid` object with modified dimensions and `origin` depending on the direction.
-  - Rotating a cube into negative `origin` coordinates (ex, if you started at `x: 0, y: 0, z:0`) will raise an error.
+  - Rotating a cuboid into negative `origin` coordinates (ex, if you started at `x: 0, y: 0, z:0` and tried to rotate it in any direction) will raise an error.
+    - In this event, you need to `move_to!(x, y, z)` first.
 
 
 ```
