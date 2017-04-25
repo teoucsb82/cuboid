@@ -1,4 +1,7 @@
 require 'rspec/core/rake_task'
+require 'coveralls'
+Coveralls.wear!
+
 RSpec::Core::RakeTask.new(:spec)
 
 desc "Just sets up a skeleton environment, kinda like Rails would if we were using it"
